@@ -80,15 +80,16 @@ export default function CapturePage() {
       formData.append("inkData", JSON.stringify(inkData));
       formData.append("image", pngBlob, `ink_${Date.now()}.png`);
 
-      // Send to API
-      const response = await fetch("/api/ingest/ink", {
+      // Send to API (Clerk-authenticated endpoint)
+      const response = await fetch("/api/notes/ink", {
         method: "POST",
         body: formData,
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || "Failed to save");
+        const errorMessage = errorData.error?.message || errorData.error || "Failed to save";
+        throw new Error(errorMessage);
       }
 
       setSaved(true);
