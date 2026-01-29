@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Package, Loader2, Plus, Calendar, ChevronRight } from 'lucide-react';
+import { Package, Loader2, Plus, Calendar, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
 
 interface KnowledgePack {
@@ -19,6 +19,7 @@ export default function PacksPage() {
   const [packs, setPacks] = useState<KnowledgePack[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [showDateOptions, setShowDateOptions] = useState(false);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -39,12 +40,11 @@ export default function PacksPage() {
 
     fetchPacks();
 
-    // Set default dates: End = today, Start = 7 days ago
+    // Set default dates for optional date picker
     const today = new Date();
     const weekAgo = new Date(today);
     weekAgo.setDate(today.getDate() - 7);
 
-    // Format as YYYY-MM-DD using local timezone
     const formatDate = (d: Date) => {
       const year = d.getFullYear();
       const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -56,21 +56,19 @@ export default function PacksPage() {
     setEndDate(formatDate(today));
   }, []);
 
-  const handleGenerate = async () => {
-    if (!startDate || !endDate) return;
-
+  const handleGenerate = async (useAllData: boolean) => {
     setIsGenerating(true);
     setError(null);
 
     try {
+      const body = useAllData
+        ? { mode: 'overwrite' }
+        : { range_start: startDate, range_end: endDate, mode: 'skip' };
+
       const response = await fetch('/api/knowledge-pack', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          range_start: startDate,
-          range_end: endDate,
-          mode: 'skip',
-        }),
+        body: JSON.stringify(body),
       });
 
       if (!response.ok) {
@@ -99,6 +97,11 @@ export default function PacksPage() {
   };
 
   const formatDateRange = (start: string, end: string) => {
+    // Check if this is an "all data" pack
+    if (start === '1970-01-01' && end === '2099-12-31') {
+      return 'All Notes Summary';
+    }
+    
     const startDate = new Date(start);
     const endDate = new Date(end);
     const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
@@ -114,52 +117,91 @@ export default function PacksPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Knowledge Packs</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Weekly summaries of your knowledge base</p>
+        <p className="mt-1 text-sm text-muted-foreground">AI-generated summaries of your knowledge base</p>
       </div>
 
       {/* Generate Pack */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Generate New Pack</CardTitle>
-          <CardDescription>Create a summary for a specific date range</CardDescription>
+          <CardDescription>Create an AI summary of all your notes</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <label className="text-sm text-muted-foreground">Start Date</label>
-              <Input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="mt-1"
-              />
-            </div>
-            <div className="flex-1">
-              <label className="text-sm text-muted-foreground">End Date</label>
-              <Input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="mt-1"
-              />
-            </div>
-            <div className="flex items-end">
-              <Button onClick={handleGenerate} disabled={isGenerating || !startDate || !endDate}>
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <Plus className="h-4 w-4" />
-                    Generate
-                  </>
-                )}
-              </Button>
-            </div>
+        <CardContent className="space-y-4">
+          {/* Main Generate Button */}
+          <Button 
+            onClick={() => handleGenerate(true)} 
+            disabled={isGenerating}
+            className="w-full sm:w-auto"
+            size="lg"
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <Plus className="h-4 w-4" />
+                Generate Summary
+              </>
+            )}
+          </Button>
+
+          {/* Optional Date Range */}
+          <div>
+            <button
+              type="button"
+              onClick={() => setShowDateOptions(!showDateOptions)}
+              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {showDateOptions ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              Specify date range (optional)
+            </button>
+
+            {showDateOptions && (
+              <div className="mt-3 p-4 bg-secondary/50 rounded-lg space-y-4">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex-1">
+                    <label className="text-sm text-muted-foreground">Start Date</label>
+                    <Input
+                      type="date"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-sm text-muted-foreground">End Date</label>
+                    <Input
+                      type="date"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+                <Button 
+                  variant="outline"
+                  onClick={() => handleGenerate(false)} 
+                  disabled={isGenerating || !startDate || !endDate}
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Calendar className="h-4 w-4" />
+                      Generate for Date Range
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
           </div>
-          {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
+
+          {error && <p className="text-sm text-destructive">{error}</p>}
         </CardContent>
       </Card>
 

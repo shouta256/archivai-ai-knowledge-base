@@ -54,8 +54,8 @@ export type RagQueryInput = z.infer<typeof ragQuerySchema>;
 
 // Knowledge Pack
 export const generatePackSchema = z.object({
-  range_start: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  range_end: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  range_start: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable(),
+  range_end: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable(),
   mode: z.enum(['skip', 'overwrite']).default('skip'),
 });
 

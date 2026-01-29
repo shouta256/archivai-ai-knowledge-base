@@ -57,13 +57,18 @@ export async function POST(req: NextRequest) {
     const { range_start, range_end, mode } = parsed.data;
     const supabase = getSupabaseAdmin();
 
+    // Determine if this is an "all data" pack (no date range)
+    const isAllData = !range_start || !range_end;
+    const effectiveStart = range_start || '1970-01-01';
+    const effectiveEnd = range_end || '2099-12-31';
+
     // Check if pack already exists
     const { data: existingPack } = await supabase
       .from('knowledge_packs')
       .select('id, content_md')
       .eq('user_id', userId)
-      .eq('range_start', range_start)
-      .eq('range_end', range_end)
+      .eq('range_start', effectiveStart)
+      .eq('range_end', effectiveEnd)
       .single<Pick<KnowledgePackRow, 'id' | 'content_md'>>();
 
     if (existingPack && mode === 'skip') {
@@ -74,14 +79,20 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Get notes in date range
-    const { data: notes, error: notesError } = await supabase
+    // Get notes (all data or in date range)
+    let notesQuery = supabase
       .from('notes')
       .select('title, content_text, ink_caption, created_at')
       .eq('user_id', userId)
-      .gte('created_at', range_start)
-      .lte('created_at', range_end + 'T23:59:59.999Z')
-      .order('created_at', { ascending: true })
+      .order('created_at', { ascending: true });
+
+    if (!isAllData) {
+      notesQuery = notesQuery
+        .gte('created_at', effectiveStart)
+        .lte('created_at', effectiveEnd + 'T23:59:59.999Z');
+    }
+
+    const { data: notes, error: notesError } = await notesQuery
       .returns<Pick<NoteRow, 'title' | 'content_text' | 'ink_caption' | 'created_at'>[]>();
 
     if (notesError) {
@@ -90,7 +101,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Generate pack
-    const contentMd = await generateKnowledgePack(notes || [], range_start, range_end);
+    const contentMd = await generateKnowledgePack(notes || [], effectiveStart, effectiveEnd);
 
     // Upsert pack
     let packId: string;
@@ -110,8 +121,8 @@ export async function POST(req: NextRequest) {
         .from('knowledge_packs')
         .insert({
           user_id: userId,
-          range_start,
-          range_end,
+          range_start: effectiveStart,
+          range_end: effectiveEnd,
           content_md: contentMd,
         } as KnowledgePackRow)
         .select('id')
