@@ -390,3 +390,27 @@ body {
     background-position: -200% 0;
   }
 }
+
+/* Date input styling for iOS/Safari compatibility */
+input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: 44px;
+  color-scheme: dark light;
+}
+
+input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0.6;
+  cursor: pointer;
+  filter: invert(0);
+}
+
+@media (prefers-color-scheme: dark) {
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
+}

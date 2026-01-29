@@ -39,15 +39,21 @@ export default function PacksPage() {
 
     fetchPacks();
 
-    // Set default dates to last week
-    const now = new Date();
-    const lastSunday = new Date(now);
-    lastSunday.setDate(now.getDate() - now.getDay());
-    const lastMonday = new Date(lastSunday);
-    lastMonday.setDate(lastSunday.getDate() - 6);
+    // Set default dates: End = today, Start = 7 days ago
+    const today = new Date();
+    const weekAgo = new Date(today);
+    weekAgo.setDate(today.getDate() - 7);
 
-    setStartDate(lastMonday.toISOString().split('T')[0]);
-    setEndDate(lastSunday.toISOString().split('T')[0]);
+    // Format as YYYY-MM-DD using local timezone
+    const formatDate = (d: Date) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    setStartDate(formatDate(weekAgo));
+    setEndDate(formatDate(today));
   }, []);
 
   const handleGenerate = async () => {

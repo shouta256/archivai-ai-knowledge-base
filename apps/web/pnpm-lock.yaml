@@ -10,7 +10,7 @@ importers:
     dependencies:
       '@clerk/nextjs':
         specifier: ^6.36.10
-        version: 6.36.10(next@16.1.5(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 6.36.10(next@16.1.5(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@google/genai':
         specifier: ^1.38.0
         version: 1.38.0
@@ -40,7 +40,7 @@ importers:
         version: 0.563.0(react@19.2.3)
       next:
         specifier: 16.1.5
-        version: 16.1.5(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 16.1.5(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       perfect-freehand:
         specifier: ^1.2.2
         version: 1.2.2
@@ -53,6 +53,9 @@ importers:
       tailwind-merge:
         specifier: ^3.4.0
         version: 3.4.0
+      tailwindcss-animate:
+        specifier: ^1.0.7
+        version: 1.0.7(tailwindcss@4.1.18)
     devDependencies:
       '@tailwindcss/postcss':
         specifier: ^4
@@ -2516,6 +2519,11 @@ packages:
   tailwind-merge@3.4.0:
     resolution: {integrity: sha512-uSaO4gnW+b3Y2aWoWfFpX62vn2sR3skfhbjsEnaBI81WD1wBLlHZe5sWf0AqjksNdYTbGBEd0UasQMT3SNV15g==}
 
+  tailwindcss-animate@1.0.7:
+    resolution: {integrity: sha512-bl6mpH3T7I3UFxuvDEXLxy/VuFxBk5bbzplh7tXI68mwMokNYd1t9qPBHlnyTwfa4JGC4zP516I1hYYtQ/vspA==}
+    peerDependencies:
+      tailwindcss: '>=3.0.0 || insiders'
+
   tailwindcss@4.1.18:
     resolution: {integrity: sha512-4+Z+0yiYyEtUVCScyfHCxOYP06L5Ne+JiHhY2IjR2KWMIWhJOYZKLSGZaP5HkZ8+bY0cxfzwDE5uOmzFXyIwxw==}
 
@@ -2805,13 +2813,13 @@ snapshots:
       react-dom: 19.2.3(react@19.2.3)
       tslib: 2.8.1
 
-  '@clerk/nextjs@6.36.10(next@16.1.5(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
+  '@clerk/nextjs@6.36.10(next@16.1.5(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
     dependencies:
       '@clerk/backend': 2.29.5(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@clerk/clerk-react': 5.59.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@clerk/shared': 3.43.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@clerk/types': 4.101.13(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      next: 16.1.5(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      next: 16.1.5(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
       server-only: 0.0.1
@@ -4834,7 +4842,7 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
-  next@16.1.5(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
+  next@16.1.5(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
     dependencies:
       '@next/env': 16.1.5
       '@swc/helpers': 0.5.15
@@ -4843,7 +4851,7 @@ snapshots:
       postcss: 8.4.31
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
-      styled-jsx: 5.1.6(react@19.2.3)
+      styled-jsx: 5.1.6(@babel/core@7.28.6)(react@19.2.3)
     optionalDependencies:
       '@next/swc-darwin-arm64': 16.1.5
       '@next/swc-darwin-x64': 16.1.5
@@ -5290,10 +5298,12 @@ snapshots:
 
   strip-json-comments@3.1.1: {}
 
-  styled-jsx@5.1.6(react@19.2.3):
+  styled-jsx@5.1.6(@babel/core@7.28.6)(react@19.2.3):
     dependencies:
       client-only: 0.0.1
       react: 19.2.3
+    optionalDependencies:
+      '@babel/core': 7.28.6
 
   supports-color@7.2.0:
     dependencies:
@@ -5308,6 +5318,10 @@ snapshots:
       use-sync-external-store: 1.6.0(react@19.2.3)
 
   tailwind-merge@3.4.0: {}
+
+  tailwindcss-animate@1.0.7(tailwindcss@4.1.18):
+    dependencies:
+      tailwindcss: 4.1.18
 
   tailwindcss@4.1.18: {}
 
