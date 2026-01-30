@@ -122,9 +122,9 @@ export default function CapturePage() {
   const sizes = [2, 4, 6, 8];
 
   return (
-    <div className="container mx-auto py-6 px-4 max-w-4xl">
+    <div className="container mx-auto py-6 px-0 sm:px-4 max-w-4xl">
       <Card>
-        <CardHeader className="pb-4">
+        <CardHeader className="pb-4 px-4 sm:px-6">
           <CardTitle className="flex items-center gap-2">
             <Pencil className="h-5 w-5" />
             Handwriting Capture
@@ -134,9 +134,9 @@ export default function CapturePage() {
           </p>
         </CardHeader>
 
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 px-0 sm:px-6">
           {/* Toolbar */}
-          <div className="flex flex-wrap items-center gap-4 pb-2 border-b">
+          <div className="flex flex-wrap items-center gap-4 pb-2 border-b px-4 sm:px-0">
             {/* Colors */}
             <div className="flex items-center gap-1">
               <span className="text-sm text-muted-foreground mr-1">Color:</span>
@@ -220,13 +220,13 @@ export default function CapturePage() {
 
           {/* Status */}
           {error && (
-            <div className="text-sm text-red-500 bg-red-50 p-2 rounded">
+            <div className="text-sm text-red-500 bg-red-50 p-2 rounded px-4 sm:px-0">
               {error}
             </div>
           )}
 
           {/* Save button */}
-          <div className="flex justify-between items-center pt-2">
+          <div className="flex justify-between items-center pt-2 px-4 sm:px-0">
             <span className="text-sm text-muted-foreground">
               {strokes.length} stroke{strokes.length !== 1 ? "s" : ""}
             </span>
@@ -256,7 +256,7 @@ export default function CapturePage() {
           </div>
 
           {/* Instructions */}
-          <div className="text-xs text-muted-foreground bg-gray-50 p-3 rounded">
+          <div className="text-xs text-muted-foreground bg-gray-50 p-3 rounded px-4 sm:px-0">
             <p className="font-medium mb-1">Tips:</p>
             <ul className="list-disc list-inside space-y-0.5">
               <li>Use Apple Pencil for best results with pressure sensitivity</li>
