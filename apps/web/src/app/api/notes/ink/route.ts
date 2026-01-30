@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { errorResponse, successResponse } from '@/lib/api-utils';
-import { enqueueJob } from '@/lib/jobs';
+import { generateInkCaption } from '@/lib/gemini';
 
 // Ink data structure from InkCanvas component
 interface InkData {
@@ -125,7 +125,30 @@ export async function POST(req: NextRequest) {
       },
     };
 
-    // Create ink note
+    // Generate caption synchronously
+    let ink_caption = '';
+    if (!uploadError) {
+      try {
+        // Download image from Supabase Storage (as buffer)
+        const { data: imageData, error: downloadError } = await supabase.storage
+          .from(INK_BUCKET)
+          .download(imagePath);
+        if (!downloadError && imageData) {
+          const arrayBuffer = await imageData.arrayBuffer();
+          const base64 = Buffer.from(arrayBuffer).toString('base64');
+          ink_caption = await generateInkCaption(base64);
+        }
+      } catch (e) {
+        console.error('Gemini Vision error:', e);
+      }
+    }
+    // Fallback if caption is empty
+    if (!ink_caption) {
+      const strokeCount = dbInkJson.strokes?.length || 0;
+      ink_caption = `Handwritten note (${strokeCount} strokes)`;
+    }
+
+    // Create ink note with caption
     const { data: note, error } = await supabase
       .from('notes')
       .insert({
@@ -133,6 +156,7 @@ export async function POST(req: NextRequest) {
         type: 'ink',
         ink_json: dbInkJson,
         ink_image_path: uploadError ? null : imagePath,
+        ink_caption,
         tags: [],
       })
       .select('id')
@@ -143,14 +167,11 @@ export async function POST(req: NextRequest) {
       return errorResponse('database_error', 'Failed to create note', 500);
     }
 
-    // Enqueue caption job to analyze handwriting with Gemini Vision
-    await enqueueJob(userId, 'caption_ink', { note_id: note.id });
-
     return successResponse(
       {
         note_id: note.id,
         image_path: uploadError ? null : imagePath,
-        jobs_enqueued: ['caption_ink'],
+        ink_caption,
       },
       201
     );
